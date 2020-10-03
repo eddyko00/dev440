@@ -58,18 +58,21 @@ var app = {
         var trObjListStr = iisWebObj.trObjListStr;
         var trObjList = JSON.parse(trObjListStr);
         var trObjacc = null;
-
-        var close = stockObj.afstockInfo.fclose;
-        var preClose = stockObj.prevClose;
-        var percent = 100 * (close - preClose) / preClose;
-        var percentSt = percent.toFixed(2) + '%';
-
+        var percentSt = "";
+        var close = 0;
+        var preClose = 0;
+        if (stockObj.afstockInfo != null) {
+            close = stockObj.afstockInfo.fclose;
+            preClose = stockObj.prevClose;
+            var percent = 100 * (close - preClose) / preClose;
+            percentSt = percent.toFixed(2) + '%';
+        }
 
         var stStr = 'Trading Model Listing<br>';
         var stStatus = "";
         if (stockObj.substatus == 12) { //ConstantKey.STOCK_SPLIT STOCK_DETLA = 12
             stStatus = "St: L Detla";
-        }        
+        }
         if (stockObj.substatus == 10) { //ConstantKey.STOCK_SPLIT STOCK_SPLIT = 10
             stStatus = "St: Split";
         }
@@ -90,32 +93,49 @@ var app = {
             var trObj = trObjList[i];
             console.log(trObj);
             var nameId = trObj.id;
-            if (trObj.trname === "TR_MV") {
-                ;
-            } else if (trObj.trname === "TR_MACD") {
-                ;
-            } else if (trObj.trname === "TR_NN1") {
-                ;                
-            } else if (trObj.trname === "TR_NN2") {
-                ;
-            } else if (trObj.trname === "TR_ACC") {
-                trObjacc = trObj;
-            } else {
-                if (custObj.username.toUpperCase() === "GUEST") {
+            if (custObj.username.toUpperCase() === "GUEST") {
+                if (trObj.trname === "TR_MV") {
+                    ;
+                } else if (trObj.trname === "TR_MACD") {
+                    ;
+                } else if (trObj.trname === "TR_NN1") {
+                    ;
+                } else if (trObj.trname === "TR_NN2") {
+                    ;
+                } else if (trObj.trname === "TR_ACC") {
+                    trObjacc = trObj;
+                } else {
                     continue;
                 }
-                if (trObj.trname === "TR_NN3") {
+            } else {
+                if (trObj.trname === "TR_MV") {
                     ;
+                } else if (trObj.trname === "TR_MACD") {
+                    ;
+                } else if (trObj.trname === "TR_NN1") {
+                    ;
+                } else if (trObj.trname === "TR_NN2") {
+                    ;
+                } else if (trObj.trname === "TR_NN3") {
+                    ;
+                } else if (trObj.trname === "TR_ACC") {
+                    trObjacc = trObj;
                 } else {
                     continue;
                 }
             }
 
+
 //https://demos.jquerymobile.com/1.1.2/docs/content/content-grids.html
             var htmlName = '<div class="ui-grid-b">';
             var dispName = trObj.trname;
             if (trObj.trname === "TR_ACC") {
-                dispName = "ACCOUNT";
+                var status = trObj.status;
+                if (status == 2) { //int PENDING = 2;
+                    dispName = "Deleting"
+                } else {
+                    dispName = "ACCOUNT"
+                }
             }
 
             htmlName += '<div class="ui-block-a" ><strong>' + dispName + '</strong></div>';
@@ -133,9 +153,9 @@ var app = {
             htmlName += '<div class="ui-block-b" style="width:20%">:' + signal + '</div>';
             var total = trObj.balance + sharebalance;
             total = total - trObj.investment;
-            var totalSt = Number(total).toLocaleString('en');
+            var totalSt = Number(total).toLocaleString('en-US', {style:'currency', currency:'USD'});
 //            var totalSt = total.toFixed(2);
-            htmlName += '<div class="ui-block-c">Profit: $' + totalSt + '</div>';
+            htmlName += '<div class="ui-block-c">Profit: ' + totalSt + '</div>';
             htmlName += '</div>';
 
 //            var trStr = '  L:' + trObj.longamount + ' LS:' + trObj.longshare + ' S:' + trObj.shortamount + ' SS:' + trObj.shortshare
@@ -163,9 +183,12 @@ var app = {
             htmlBtn += '</div>';
 
             htmlName += htmlBtn;
-            if (trObj.trname === "TR_NN2") {
+            if (trObj.trname === "TR_NN1") {
+                htmlName += 'Auto Trading Signal using AI Model';
+            } else if (trObj.trname === "TR_NN2") {
                 htmlName += 'Auto Trading Signal using AI Model';
             } else if (trObj.trname === "TR_ACC") {
+
                 var link = trObj.linktradingruleid;
                 var trObjlink = null;
                 for (j = 0; j < trObjList.length; j++) {
@@ -328,6 +351,7 @@ var app = {
             if (type === "graph") {
                 if (trname != null) {
                     var symbol = stockObj.symbol;
+                    $("#graphheader").html("Display graph - " + stockObj.symbol);
                     symbol = symbol.replace(".", "_");
                     var resultURL = iisurl + "cust/" + custObj.username + "/acc/" + accId + "/st/" + symbol + "/tr/" + trname + "/tran/history/chart";
 //                resultURL = "https://iiswebsrv.herokuapp.com/cust/guest/acc/3/st/hou_to/tr/tr_macd/tran/history/chart";
@@ -339,6 +363,8 @@ var app = {
             if (type === "table") {
                 if (trname != null) {
                     var symbol = stockObj.symbol;
+                    $("#tablehheader").html("Trading Performance - " + stockObj.symbol);
+
                     symbol = symbol.replace(".", "_");
                     var urlSt = iisurl + "cust/" + custObj.username + "/acc/" + accId + "/st/" + symbol + "/tr/" + trname + "/perf";
                     console.log(urlSt);
@@ -366,12 +392,16 @@ var app = {
                                     var shareAmount = PerfObj.performData.share * PerfObj.performData.close;
                                     balance += shareAmount;
                                 }
-                                var balanceSt = Number(balance).toLocaleString('en');
-                                var netprofitSt = Number(PerfObj.netprofit).toLocaleString('en');
+                                var balanceSt = Number(balance).toLocaleString('en-US', {style:'currency', currency:'USD'});
+                                var netprofitSt = Number(PerfObj.netprofit).toLocaleString('en-US', {style:'currency', currency:'USD'});
+
+                                var percent = 100 * (PerfObj.netprofit / PerfObj.investment);
+                                var percentSt = Number(percent.toFixed(2)).toLocaleString('en');
 
                                 var htmlName = "";
-                                htmlName += '<div class="ui-block-a" ><strong>' + 'Netprofit: $' + netprofitSt + '</strong></div>';
-                                htmlName += '<div class="ui-block-b" >' + " " + '</div>';
+                                htmlName += '<div class="ui-grid-a">';
+                                htmlName += '<div class="ui-block-a" ><strong>' + 'Netprofit: ' + netprofitSt + '</strong></div>';
+                                htmlName += '<div class="ui-block-b" >Profit(%): ' + percentSt + '%</div>';
                                 htmlName += '</div>';
                                 htmlName += '<br>';
                                 htmlName += '<div class="ui-grid-a">';
@@ -381,10 +411,10 @@ var app = {
                                 htmlName += '<div class="ui-grid-a">';
                                 htmlName += '<br>';
                                 htmlName += '<div class="ui-grid-a">';
-                                var investmentSt = Number(PerfObj.investment).toLocaleString('en');
-                                htmlName += '<div class="ui-block-a" >' + 'Balance: $' + balanceSt + '</div>';
-                                var netprofitSt = Number(PerfObj.netprofit).toLocaleString('en');
-                                htmlName += '<div class="ui-block-b" >' + 'Invest: $' + investmentSt + '</div>';
+                                var investmentSt = Number(PerfObj.investment).toLocaleString('en-US', {style:'currency', currency:'USD'});
+                                htmlName += '<div class="ui-block-a" >' + 'Balance: ' + balanceSt + '</div>';
+                                var netprofitSt = Number(PerfObj.netprofit).toLocaleString('en-US', {style:'currency', currency:'USD'});
+                                htmlName += '<div class="ui-block-b" >' + 'Max Inv: ' + investmentSt + '</div>';
                                 htmlName += '</div>';
 
                                 htmlName += '<div class="ui-grid-a">';
@@ -497,6 +527,8 @@ var app = {
                 trName = "TR_ACC";
             } else if (trNum == 2) {
                 trName = "TR_MACD";
+            } else if (trNum == 4) {
+                trName = "TR_NN1";                
             } else if (trNum == 5) {
                 trName = "TR_NN2";
             }

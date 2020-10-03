@@ -345,7 +345,6 @@
     https://demos.jquerymobile.com/1.3.2/widgets/listviews/index.html#&ui-state=dialog
     -->
     <body>
-
         <div data-role="page" id="page-index">
             <div data-role="header" data-theme="c" data-position="fixed">
                 <a href="accountst_1.html" data-icon="back" data-iconpos="notext" ui-btn-icon-Left data-transition="slide" data-direction="reverse"></a>
@@ -387,22 +386,11 @@
             <select id="myidtrmodel">
                 <option value="TR_ACC">Manual Trading</option>
                 <option value="TR_MACD">Auto Trading TR_MACD</option>                
+                <option value="TR_NN1">Auto Trading TR_NN1</option>
                 <option value="TR_NN2">Auto Trading TR_NN2</option>
             </select>
             <p></p><br>
             <button id="savesubmit" >Save Changes</button>
-
-            <!--            <div id="myidbtn"  data-role="controlgroup" data-type="horizontal" data-theme="a" style="font-size:0.7em; margin-left:auto; margin-right:auto;width:100%; ">
-                            <a href="#popupSave" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline " data-transition="pop">Save Changes</a>
-                            <div data-role="popup" id="popupSave" data-theme="a" class="ui-corner-all">
-                                    <form>
-                                            <div style="padding:0px 0px;">
-                                                    <h3>Confirm Your Changes</h3>
-                                                    <button type="submit" id="savesubmit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left">Confirm</button>
-                                                </div>
-                                        </form>
-                            </div>                
-                        </div>-->
 
         </div><!-- /page -->    
 
@@ -412,7 +400,7 @@
                 <h1>IISWEB System</h1>
             </div><!-- /header -->
             <div role="main" class="ui-content">
-                <h2 class="mc-text-center">Display graph</h2>
+                <h2 id="graphheader" class="mc-text-center">Display graph</h2>
             </div><!-- /content -->
             <div data-role="content" id="imgcontent ">                
                 <img id="spaceimage" src="images/loader.gif" style="max-width:100%;">Retrieving Graph. Please wait....</img>
@@ -426,7 +414,8 @@
                 <h1>IISWEB System</h1>
             </div><!-- /header -->
             <div role="main" class="ui-content">
-                <h2 class="mc-text-center">Trading Model Performance</h2>
+                <h2 id="tablehheader" class="mc-text-center">Trading Model Performance</h2>                
+
             </div><!-- /content -->
             <div data-role="content" id="textcontent">
 
@@ -436,12 +425,11 @@
             </div>
             <p class="mc-top-margin-1-5">Performance result assumption:</p>
             <ul>
-                <li>Each transaction $5000</li>
-                <li>Stock supports short and long trading</li>                      
-                <li>no commission fee per trade</li>                    
+                <li>Each transaction is about $5000</li>
+                <li>Stock will short selling on sell trading</li>                      
+                <li>Buy or sell has no commission fee</li>                    
             </ul>             
         </div><!-- /page -->           
-
 
 
         <script src="lib/jquery/2.1.1/jquery-2.1.1.min.js"></script>
